@@ -75,6 +75,7 @@ interface Fox
 	isEvil: boolean;
 	isEnraged: boolean;
 	hasSizeOf: number;
+	triggeredEnrage: number;
 	pos: Coordinates;
 	// triggeredEnrage: boolean;
 }
@@ -171,7 +172,7 @@ const Game: React.FC = () =>
 	
 	// Paddles
 	
-	var paddleGlobalHeight: number = 70;
+	var paddleGlobalHeight: number = 100;
 	var paddleGlobalWidth: number = 10;
 	var paddleGlobalReduction: number = 0;
 	var paddleGlobalSpeed: number = 10;
@@ -270,6 +271,8 @@ const Game: React.FC = () =>
 		// gnome: Gnome;
 		harkinian: Harkinian;
 		fox: Fox;
+		collisionFoxPaddle1: boolean;
+		collisionFoxPaddle2: boolean;
 		triggers: Triggerables;
 	}
 	
@@ -747,7 +750,7 @@ const Game: React.FC = () =>
 		}
 	}
 	
-	function drawFox(ctx: CanvasRenderingContext2D, score1: number, score2: number, foxUnlocked: boolean, foxEvil: boolean, foxEnraged: boolean, foxPosX: number, foxPosY: number): void
+	function drawFox(ctx: CanvasRenderingContext2D, score1: number, score2: number, foxUnlocked: boolean, foxEvil: boolean, foxEnraged: boolean, triggeredEnrage: number, collisionFoxPaddle1: boolean, collisionFoxPaddle2: boolean, foxPosX: number, foxPosY: number): void
 	{
 		if (foxUnlocked === true)
 		{
@@ -762,6 +765,22 @@ const Game: React.FC = () =>
 			else
 			{
 				ctx.drawImage(imageFoxGood.current, foxPosX * resizingFactor, foxPosY * resizingFactor);
+			}
+
+			if (triggeredEnrage > 0 && (audioFoxEnrage.current.paused || audioFoxEnrage.current.ended))
+			{
+				audioFoxEnrage.current.play();
+			}
+			if (collisionFoxPaddle1 === true || collisionFoxPaddle2 === true)
+			{
+				if (foxEvil === true && foxSoundsEvilIsPlaying() === false)
+				{
+					fox_sounds_evil();
+				}
+				if (foxEvil === false && foxSoundsGoodIsPlaying() === false)
+				{
+					fox_sounds_good();
+				}
 			}
 		}
 	}
@@ -1191,6 +1210,40 @@ const Game: React.FC = () =>
 	// 		foxTimestampLastAppeased = timestamp;
 	// 	}
 	// }
+
+	function foxSoundsGoodIsPlaying(): boolean
+	{
+		if (audioFoxChicken.current.paused === false || audioFoxChicken.current.ended === false)
+			return true;
+		if (audioFoxGoat.current.paused === false || audioFoxGoat.current.ended === false)
+			return true;
+		if (audioFoxMeow.current.paused === false || audioFoxMeow.current.ended === false)
+			return true;
+		if (audioFoxPig.current.paused === false || audioFoxPig.current.ended === false)
+			return true;
+		if (audioFoxQuack.current.paused === false || audioFoxQuack.current.ended === false)
+			return true;
+		if (audioFoxTweet.current.paused === false || audioFoxTweet.current.ended === false)
+			return true;
+		if (audioFoxWoof.current.paused === false || audioFoxWoof.current.ended === false)
+			return true;
+		return false;
+	}
+
+	function foxSoundsEvilIsPlaying(): boolean
+	{
+		if (audioFoxAhee.current.paused === false || audioFoxAhee.current.ended === false)
+			return true;
+		if (audioFoxCha.current.paused === false || audioFoxCha.current.ended === false)
+			return true;
+		if (audioFoxKaka.current.paused === false || audioFoxKaka.current.ended === false)
+			return true;
+		if (audioFoxPapa.current.paused === false || audioFoxPapa.current.ended === false)
+			return true;
+		if (audioFoxYok.current.paused === false || audioFoxYok.current.ended === false)
+			return true;
+		return false;
+	}
 	
 	function fox_sounds_good(): void
 	{
@@ -2235,7 +2288,7 @@ const Game: React.FC = () =>
 					
 					drawPaddles(context, receivedGameState.paddle1.x, receivedGameState.paddle1.y, receivedGameState.paddle2.x, receivedGameState.paddle2.y); // DONE
 					// console.log("FE - fox.isUnlocked: " + receivedGameState.fox.isUnlocked);
-					drawFox(context, receivedGameState.score1, receivedGameState.score2, receivedGameState.fox.isUnlocked, receivedGameState.fox.isEvil, receivedGameState.fox.isEnraged, receivedGameState.fox.pos.x, receivedGameState.fox.pos.y); // DONE
+					drawFox(context, receivedGameState.score1, receivedGameState.score2, receivedGameState.fox.isUnlocked, receivedGameState.fox.isEvil, receivedGameState.fox.isEnraged, receivedGameState.fox.triggeredEnrage, receivedGameState.collisionFoxPaddle1, receivedGameState.collisionFoxPaddle2, receivedGameState.fox.pos.x, receivedGameState.fox.pos.y); // DONE
 					
 					// console.log("FE - main loop - START");
 					// console.log("FE - main loop - unlockedGnome: " + unlockedGnome);

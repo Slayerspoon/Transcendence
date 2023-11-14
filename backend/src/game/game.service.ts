@@ -218,8 +218,11 @@ export class GameService
 					'isEvil': gameState?.fox.isEvil,
 					'isEnraged': gameState?.fox.isEnraged,
 					'hasSizeOf': gameState?.fox.hasSizeOf,
+					'triggeredEnrage': gameState?.fox.triggeredEnrage,
 					'pos': gameState?.fox.position
 				},
+				'collisionFoxPaddle1': gameState?.collisions.fox_paddle1,
+				'collisionFoxPaddle2': gameState?.collisions.fox_paddle2,
 				'harkinian': {
 					'pos': gameState?.harkinian.position
 				},
@@ -243,8 +246,11 @@ export class GameService
 					'isEvil': gameState?.fox.isEvil,
 					'isEnraged': gameState?.fox.isEnraged,
 					'hasSizeOf': gameState?.fox.hasSizeOf,
+					'triggeredEnrage': gameState?.fox.triggeredEnrage,
 					'pos': gameState?.fox.position
 				},
+				'collisionFoxPaddle1': gameState?.collisions.fox_paddle1,
+				'collisionFoxPaddle2': gameState?.collisions.fox_paddle2,
 				'harkinian': {
 					'pos': gameState?.harkinian.position
 				},

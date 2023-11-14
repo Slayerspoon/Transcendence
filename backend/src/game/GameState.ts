@@ -22,15 +22,18 @@ export class Coordinate {
 }
 
 export class Fox {
-	public isUnlocked:	boolean = false;
-	public isEvil:		boolean = false;
-	public isEnraged:	boolean = false;
-	public hasSizeOf:	number = config.fox.minSize;
-	public timeStamp:	number = 0;
-	public paddleTime:	number = 0;
-	public sticking:	number = 0;
-	public velocity:	number = config.ball.velocity;
-	public position:	Coordinate = new Coordinate(config.game_canvas.width / 2, config.game_canvas.height / 2);
+	public isUnlocked:				boolean = false;
+	public isEvil:					boolean = false;
+	public isEnraged:				boolean = false;
+	public hasSizeOf:				number = config.fox.minSize;
+	public timeStamp:				number = 0;
+	public timestampLastAppeased: 	number = 0;
+	public timeTillEnraged:			number = 10000;
+	public triggeredEnrage:			number = 0;
+	public paddleTime:				number = 0;
+	public sticking:				number = 0;
+	public velocity:				number = config.fox.minVelocity;
+	public position:				Coordinate = new Coordinate(config.game_canvas.width / 2, config.game_canvas.height / 2);
 
 	constructor(
 		public direction:	Coordinate
@@ -75,6 +78,15 @@ export class Ball
 		}
 }
 
+export class Collisions
+{
+	public fox_ball1: 	string = "";
+	public fox_ball2:	string = "";
+	public fox_paddle1:	boolean = false;
+	public fox_paddle2:	boolean = false;
+	public fox_wall:	string = "";
+}
+
 export class GameState 
 {
 	public paddle1:		Paddle;
@@ -84,6 +96,7 @@ export class GameState
 	public fox: 		Fox;
 	public harkinian:	Harkinian;
 	public triggers:	Triggerables;
+	public collisions:	Collisions;
 	public winner:		number;
 	public roundStart:	number;
 	public speedIncCnt: number;
@@ -93,8 +106,8 @@ export class GameState
 		private instance: GameInstance)
    {
 		let paddle_height: number = config.paddle.height;
-		this.paddle1 = new Paddle(new Coordinate(config.paddle.buffer, config.game_canvas.height / 2), paddle_height);
-		this.paddle2 = new Paddle(new Coordinate(config.game_canvas.width - config.paddle.buffer - config.paddle.width, config.game_canvas.height / 2), paddle_height);
+		this.paddle1 = new Paddle(new Coordinate(config.paddle.buffer, (config.game_canvas.height - config.paddle.height) / 2), paddle_height);
+		this.paddle2 = new Paddle(new Coordinate(config.game_canvas.width - config.paddle.buffer - config.paddle.width, (config.game_canvas.height - config.paddle.height) / 2), paddle_height);
 		this.ball = new Ball(this.calcRandomDirection(Math.random() * 2), true, config.ball.velocity);
 		this.ball2 = new Ball(this.calcRandomDirection(Math.random() * 2), false, config.ball.velocity);
 		this.fox = new Fox(this.calcRandomDirection(Math.random() * 2));
@@ -149,14 +162,242 @@ export class GameState
 			this.ball2 = this.calcBallPosition(this.ball2);
 		if (this.fox.isUnlocked)
 		{
-			this.checkFoxMood();
-			this.isEnragedFox();
-			this.calcFoxPosition();
-			this.unstickFoxFromPaddle();
-			this.freePaddles();
+			// this.checkFoxMood();
+			// this.isEnragedFox();
+			// this.calcFoxPosition();
+			// this.unstickFoxFromPaddle();
+			// this.freePaddles();
+			this.moveFox(Date.now());
+			if (this.fox.triggeredEnrage > 0)
+				this.fox.triggeredEnrage--;
 			//this.foxBallCollission();
 		}
 
+	}
+
+	public collisionCheck_foxBall(ballX: number, ballY: number, foxWidth: number, foxHeight: number): string
+	{
+		let collision = "";
+		
+		// Check "up" (with 3 pixels error margin)
+		if (ballX >= this.fox.position.x && ballX <= this.fox.position.x + foxWidth &&
+			ballY >= this.fox.position.y - 3 && ballY <= this.fox.position.y + 10)
+			//ballY >= foxPosY - 3 && ballY <= foxPosY + 3)
+		{
+			collision = "up";
+		}
+		// Check "down" (with 3 pixels error margin)
+		else if (ballX >= this.fox.position.x && ballX <= this.fox.position.x + foxWidth &&
+				 ballY >= this.fox.position.y + foxHeight - 10 && ballY <= this.fox.position.y + foxHeight + 3)
+				 //ballY >= foxPosY + imageFoxBad.height - 3 && ballY <= foxPosY + imageFoxBad.height + 3)
+		{
+			collision = "down";
+		}
+		// Check "left" (with 3 pixels error margin)
+		else if (ballY >= this.fox.position.y && ballY <= this.fox.position.y + foxHeight &&
+				 ballX >= this.fox.position.x - 3 && ballX <= this.fox.position.x + 10)
+				 //ballX >= foxPosX - 3 && ballX <= foxPosX + 3)
+		{
+			collision = "left";
+		}
+		// Check "right" (with 3 pixels error margin)
+		else if (ballY >= this.fox.position.y && ballY <= this.fox.position.y + foxHeight &&
+				 ballX >= this.fox.position.x + foxWidth - 10 && ballX <= this.fox.position.x + foxWidth + 3)
+				 //ballX >= foxPosX + imageFoxBad.width - 3 && ballX <= foxPosX + imageFoxBad.width + 3)
+		{
+			collision = "right";
+		}
+		return collision;
+	}
+
+	public collisionCheck_foxPaddle(paddleX: number, paddleY: number, foxWidth: number, foxHeight: number): boolean
+	{
+		let collision = false;
+		
+		if (paddleX === 0)
+		{
+			if (this.fox.position.y + foxHeight >= paddleY && this.fox.position.y <= paddleY + config.paddle.height &&
+				this.fox.position.x <= paddleX + config.paddle.width)
+			{
+				collision = true;
+			}
+		}
+		else
+		{
+			if (this.fox.position.y + foxHeight >= paddleY && this.fox.position.y <= paddleY + config.paddle.height &&
+				this.fox.position.x + foxWidth >= paddleX)
+			{
+				collision = true;
+			}
+		}
+		return collision;
+	}
+
+	public collisionCheck_foxWall(foxWidth: number, foxHeight: number): string
+	{
+		let collision = "";
+		
+		if (this.fox.position.x + (this.fox.velocity * this.fox.direction.x) <= 0)
+		{
+			collision = "left";
+			this.fox.position.x = 1;
+		}
+		else if (this.fox.position.x + foxWidth + (this.fox.velocity * this.fox.direction.x) >= config.game_canvas.width)
+		{
+			collision = "right";
+			this.fox.position.x = config.game_canvas.width - foxWidth - 1;
+		}
+		else if (this.fox.position.y + (this.fox.velocity * this.fox.direction.y) <= 0)
+		{
+			collision = "up";
+			this.fox.position.y = 1;
+		}
+		else if (this.fox.position.y + foxHeight + (this.fox.velocity * this.fox.direction.y) >= config.game_canvas.height)
+		{
+			collision = "down";
+			this.fox.position.y = config.game_canvas.height - foxHeight - 1;
+		}
+		return collision;
+	}
+
+	public collisionCheck(): void
+	{
+		if (this.fox.isUnlocked === true)
+		{
+			if (this.fox.isEnraged === true)
+			{
+				var foxWidth = config.fox.maxSize;
+				var foxHeight = config.fox.maxSize;
+			}
+			else
+			{
+				var foxWidth = config.fox.minSize;
+				var foxHeight = config.fox.minSize;
+			}
+
+			this.collisions.fox_ball1 = this.collisionCheck_foxBall(this.ball.position.x, this.ball.position.y, foxWidth, foxHeight);
+			this.collisions.fox_ball2 = this.collisionCheck_foxBall(this.ball2.position.x, this.ball2.position.y, foxWidth, foxHeight);
+			this.collisions.fox_paddle1 = this.collisionCheck_foxPaddle(this.paddle1.position.x, this.paddle1.position.y, foxWidth, foxHeight);
+			this.collisions.fox_paddle2 = this.collisionCheck_foxPaddle(this.paddle2.position.x, this.paddle2.position.y, foxWidth, foxHeight);
+			this.collisions.fox_wall = this.collisionCheck_foxWall(foxWidth, foxHeight);
+		}
+	}
+
+	public moveFox(timestamp: number): void
+	{
+		if (this.fox.isUnlocked === true)
+		{
+			if (this.fox.sticking === 1)
+			{
+				if (Math.floor(Math.random() * 100) === 42)
+				{
+					this.fox.timestampLastAppeased = timestamp;
+					this.fox.timeTillEnraged = 10000 + Math.floor(Math.random() * 10000);
+					this.fox.sticking = 0;
+					this.fox.isEnraged = false;
+					this.fox.isEvil = false;
+					this.fox.velocity = config.fox.minVelocity + (this.instance.getRound() / 20);
+				}
+			}
+			else if (this.fox.isEnraged)
+			{
+				if (Math.floor(Math.random() * 100) === 42)
+				{
+					this.fox.direction.x = -this.fox.direction.x;
+				}
+				if (Math.floor(Math.random() * 100) === 42)
+				{
+					this.fox.direction.y = -this.fox.direction.y;
+				}
+				this.fox.position.x = this.fox.position.x + (this.fox.velocity * this.fox.direction.x);
+				this.fox.position.y = this.fox.position.y + (this.fox.velocity * this.fox.direction.y);
+				if (this.collisions.fox_paddle1 === true || this.collisions.fox_paddle2 === true)
+				{
+					this.fox.sticking = 1;
+					this.fox.velocity = 0;
+					// fox_sounds_evil();
+				}
+			}
+			else if (this.fox.isEvil)
+			{
+				this.fox.position.x = this.fox.position.x + (this.fox.velocity * this.fox.direction.x);
+				this.fox.position.y = this.fox.position.y + (this.fox.velocity * this.fox.direction.y);
+				if (this.collisions.fox_paddle1 === true || this.collisions.fox_paddle2 === true)
+				{
+					this.fox.sticking = 1;
+					this.fox.velocity = 0;
+					// fox_sounds_evil();
+				}
+				if (this.fox.sticking === 0 && Math.floor(Math.random() * 1000) % 100 === 0)
+				{
+					this.fox.isEvil = false;
+				}
+				if (this.fox.sticking === 0 && timestamp - this.fox.timestampLastAppeased >= this.fox.timeTillEnraged)
+				{
+					// audioFoxEnrage.current.play();
+					this.fox.triggeredEnrage = 5;
+					this.fox.isEnraged = true;
+					this.fox.isEvil = true;
+					this.fox.velocity = config.fox.maxVelocity;
+				}
+			}
+			else
+			{
+				this.fox.position.x = this.fox.position.x + (this.fox.velocity * this.fox.direction.x);
+				this.fox.position.y = this.fox.position.y + (this.fox.velocity * this.fox.direction.y);
+				if (this.collisions.fox_paddle1 === true)
+				{
+					this.fox.direction.x = 1;
+					this.fox.timestampLastAppeased = timestamp;
+					this.fox.timeTillEnraged = 10000 + Math.floor(Math.random() * 10000);
+					// fox_sounds_good();
+				}
+				else if (this.collisions.fox_paddle2 === true)
+				{
+					this.fox.direction.x = -1;
+					this.fox.timestampLastAppeased = timestamp;
+					this.fox.timeTillEnraged = 10000 + Math.floor(Math.random() * 10000);
+					// fox_sounds_good();
+				}
+				if (Math.floor(Math.random() * 1000) % 100 === 0)
+				{
+					this.fox.isEvil = true;
+				}
+				if (this.fox.sticking === 0 && timestamp - this.fox.timestampLastAppeased >= this.fox.timeTillEnraged)
+				{
+					// audioFoxEnrage.current.play();
+					this.fox.triggeredEnrage = 5;
+					this.fox.isEnraged = true;
+					this.fox.isEvil = true;
+					this.fox.velocity = config.fox.maxVelocity;
+				}
+			}
+			
+			if (this.collisions.fox_wall === "up")
+			{
+				this.fox.position.y++;
+				this.fox.direction.y = -this.fox.direction.y;
+			}
+			else if (this.collisions.fox_wall === "down")
+			{
+				this.fox.position.y--;
+				this.fox.direction.y = -this.fox.direction.y;
+			}
+			else if (this.collisions.fox_wall === "left")
+			{
+				this.fox.position.x++;
+				this.fox.direction.x = -this.fox.direction.x;
+			}
+			else if (this.collisions.fox_wall === "right")
+			{
+				this.fox.position.x--;
+				this.fox.direction.x = -this.fox.direction.x;
+			}
+		}
+		else
+		{
+			this.fox.timestampLastAppeased = timestamp;
+		}
 	}
 
 	public adjustBallVelocityDuringRound(): void
@@ -166,6 +407,7 @@ export class GameState
 		if (timeNow - this.roundStart >= 1000 * this.speedIncCnt)
 		{
 			this.ball.velocity += 0.1;
+			this.ball2.velocity += 0.1;
 			this.speedIncCnt++;
 		}
 	}
@@ -339,152 +581,172 @@ export class GameState
 		}
 	}
 
-	public unstickFoxFromPaddle(): void
-	{
-		if (!this.fox.isUnlocked || !this.fox.isEvil)
-			return;
-		if ((Date.now() > this.fox.sticking + config.fox.timeStick2Paddle) || 
-			(Math.random() * 1000 <= 10))
-		{
-			this.fox.isEvil = false;
-			this.fox.timeStamp = Date.now();
-			this.fox.sticking = 0;
-		}
-	}
+	// public unstickFoxFromPaddle(): void
+	// {
+	// 	if (this.fox.isUnlocked === false || this.fox.isEvil === false)
+	// 		return;
+	// 	if ((Date.now() > config.fox.timeStick2Paddle + Math.floor(Math.random() * 1000)))
+	// 	{
+	// 		this.fox.isEvil = false;
+	// 		this.fox.timeStamp = Date.now();
+	// 		this.fox.sticking = 0;
+	// 	}
+	// }
 
-	public checkFoxMood(): void
-	{
-		if (!this.fox.isUnlocked)
-			return;
-		if (Date.now() > this.fox.timeStamp + config.fox.maxTimeGoodEvil)
-		{
-			this.fox.timeStamp = Date.now();
-			if (Math.random() * 1000 > 500)
-				this.fox.isEvil = true;
-			else
-				this.fox.isEvil = false;
-		}
-	}
+	// public checkFoxMood(): void
+	// {
+	// 	if (!this.fox.isUnlocked)
+	// 		return;
+	// 	if (Date.now() > this.fox.timeStamp + config.fox.minTimeGoodEvil)
+	// 	{
+	// 		if (Math.random() * 100 % 42 === 0)
+	// 		{
+	// 			this.fox.timeStamp = Date.now();
+	// 			this.fox.isEvil = true;
+	// 		}
+	// 		else
+	// 			this.fox.isEvil = false;
+	// 	}
+	// }
 
-	public isEnragedFox(): void
-	{
-		if (!this.fox.isUnlocked || !this.fox.isEnraged)
-			return;
-		let rndTime = Math.random() * config.fox.getEnragedIn;
-		if (Date.now() < this.fox.paddleTime + config.fox.getEnragedIn + rndTime)
-		{
-			this.fox.isEnraged = true;
-			this.fox.velocity = config.fox.maxVelocity;
-			this.fox.hasSizeOf = config.fox.maxSize;
-		}
-		else
-			this.unrageFox;
-	}
+	// public isEnragedFox(): void
+	// {
+	// 	if (!this.fox.isUnlocked || !this.fox.isEnraged)
+	// 		return;
+	// 	let rndTime = Math.random() * config.fox.getEnragedIn;
+	// 	if (Date.now() < this.fox.paddleTime + config.fox.getEnragedIn + rndTime)
+	// 	{
+	// 		this.fox.isEnraged = true;
+	// 		this.fox.velocity = config.fox.maxVelocity;
+	// 		this.fox.hasSizeOf = config.fox.maxSize;
+	// 	}
+	// 	else
+	// 		this.unrageFox;
+	// }
 
-	public unrageFox(): void
-	{
-		if (!this.fox.isUnlocked || !this.fox.isEnraged)
-			return;
-		this.fox.isEnraged = false;
-		this.fox.velocity = config.fox.minVelocity;
-		this.fox.hasSizeOf = config.fox.minSize;
-		this.fox.isEvil = false;
-		this.fox.timeStamp = Date.now();
-	}
+	// public unrageFox(): void
+	// {
+	// 	if (!this.fox.isUnlocked || !this.fox.isEnraged)
+	// 		return;
+	// 	this.fox.isEnraged = false;
+	// 	this.fox.velocity = config.fox.minVelocity;
+	// 	this.fox.hasSizeOf = config.fox.minSize;
+	// 	this.fox.isEvil = false;
+	// 	this.fox.timeStamp = Date.now();
+	// }
 
 	public foxPaddleBehavior(paddle: number): void
 	{
-		this.unrageFox();
-		if (!this.fox.isEvil)
-			this.fox.paddleTime = Date.now();
-		else
+		if (this.fox.isUnlocked === true)
 		{
-			if (paddle == 1)
-				this.paddle1.isImmobile = true;
-			else
-				this.paddle2.isImmobile = true;
-			this.fox.velocity = 0;
-			this.fox.paddleTime = Date.now() + Math.random() * config.fox.timeStick2Paddle;
-		}
-	}
-
-	public freePaddles(): void
-	{
-		if (!this.fox.isUnlocked || this.fox.velocity == 0)
-			return;
-		if (this.fox.paddleTime < Date.now())
-		{
-			this.fox.paddleTime = Date.now();
-			this.paddle1.isImmobile = false;
-			this.paddle2.isImmobile = false;
-			this.fox.isEvil = false;
-			this.fox.velocity = config.fox.minVelocity;
-			this.fox.timeStamp = Date.now();
-		}
-	}
-
-	public calcFoxPosition() {
-		let fox_new_x: number = this.fox.position.x + Math.round(this.fox.velocity * this.fox.direction.x);
-		let fox_new_y: number = this.fox.position.y + Math.round(this.fox.velocity * this.fox.direction.y);
-
-		if (this.fox.sticking)
-			return;
-
-		if (fox_new_y - this.fox.hasSizeOf <= 0) {
-			fox_new_y = this.fox.hasSizeOf;
-			this.fox.direction.y *= -1;
-		} else if (fox_new_y + this.fox.hasSizeOf >= config.game_canvas.height) {
-			fox_new_y = config.game_canvas.height - this.fox.hasSizeOf;
-			this.fox.direction.y *= -1;
-		}
-		if (fox_new_x - this.fox.hasSizeOf <= 0) 
-		{
-			fox_new_x = this.fox.hasSizeOf;
-			this.fox.direction.x *= -1;
-		}
-		else if (fox_new_x + this.fox.hasSizeOf >= config.game_canvas.width) 
-		{
-			fox_new_x = config.game_canvas.width - this.fox.hasSizeOf;
-			this.fox.direction.x *= -1;
-		}
-		if ((fox_new_x - this.fox.hasSizeOf) <= (config.paddle.buffer + config.paddle.width)) {
-			if ((((fox_new_y - this.fox.hasSizeOf) > (this.paddle1.position.y + this.paddle1.height)) ||
-				((fox_new_y + this.fox.hasSizeOf) < this.paddle1.position.y)))
+			if (this.fox.sticking === 1)
 			{
-					//do nothing
+				if (this.collisions.fox_paddle1 === true)
+				{
+					this.paddle1.isImmobile = true;
+				}
+				if (this.collisions.fox_paddle2 === true)
+				{
+					this.paddle2.isImmobile = true;
+				}
 			}
 			else
 			{
-				fox_new_x = this.paddle1.position.x + config.paddle.width + this.fox.hasSizeOf;
-				this.fox.direction.y = (fox_new_y - (this.paddle1.position.y + (this.paddle1.height / 2))) / (config.paddle.height / 4);
-				this.fox.direction.x *= -1;
-				this.foxPaddleBehavior(1);
+				this.paddle1.isImmobile = false;
+				this.paddle2.isImmobile = false;
 			}
 		}
-		else if (fox_new_x + this.fox.hasSizeOf >= (config.game_canvas.width - config.paddle.buffer - config.paddle.width))
-		{
-			if (((((fox_new_y - this.fox.hasSizeOf) > (this.paddle2.position.y + this.paddle1.height)) ||
-				(fox_new_y + this.fox.hasSizeOf) < this.paddle2.position.y)))
-			{
-				//do nothing
-			}
-			else
-			{
-				fox_new_x = this.paddle2.position.x - this.fox.hasSizeOf;
-				this.fox.direction.y = (fox_new_y - (this.paddle2.position.y + (this.paddle2.height / 2))) / (config.paddle.height / 4);
-				this.fox.direction.x *= -1;
-				this.foxPaddleBehavior(2);
-			}
-		}
-		// 1% chance if enraged to reverse x and/or y direction
-		if (this.fox.isEnraged && Math.random() * 1000 <= 10)
-			this.fox.direction.x *= -1;
-		if (this.fox.isEnraged && Math.random() * 1000 <= 10)
-			this.fox.direction.y *= -1;
-
-		this.fox.position.x = fox_new_x;
-		this.fox.position.y = fox_new_y;
+		// if (this.fox.isEvil === false)
+		// 	this.fox.paddleTime = Date.now();
+		// else
+		// {
+		// 	if (paddle == 1)
+		// 		this.paddle1.isImmobile = true;
+		// 	else
+		// 		this.paddle2.isImmobile = true;
+		// 	this.fox.velocity = 0;
+		// 	this.fox.sticking = 1;
+		// 	this.fox.paddleTime = Date.now() + Math.floor(Math.random() * config.fox.timeStick2Paddle);
+		// }
 	}
+
+	// public freePaddles(): void
+	// {
+	// 	if (!this.fox.isUnlocked || this.fox.velocity == 0)
+	// 		return;
+	// 	if (this.fox.paddleTime < Date.now())
+	// 	{
+	// 		this.fox.paddleTime = Date.now();
+	// 		this.paddle1.isImmobile = false;
+	// 		this.paddle2.isImmobile = false;
+	// 		this.fox.isEvil = false;
+	// 		this.fox.velocity = config.fox.minVelocity;
+	// 		this.fox.timeStamp = Date.now();
+	// 	}
+	// }
+
+	// public calcFoxPosition() {
+	// 	let fox_new_x: number = this.fox.position.x + Math.round(this.fox.velocity * this.fox.direction.x);
+	// 	let fox_new_y: number = this.fox.position.y + Math.round(this.fox.velocity * this.fox.direction.y);
+
+	// 	if (this.fox.sticking)
+	// 		return;
+
+	// 	if (fox_new_y - this.fox.hasSizeOf <= 0) {
+	// 		fox_new_y = this.fox.hasSizeOf;
+	// 		this.fox.direction.y *= -1;
+	// 	} else if (fox_new_y + this.fox.hasSizeOf >= config.game_canvas.height) {
+	// 		fox_new_y = config.game_canvas.height - this.fox.hasSizeOf;
+	// 		this.fox.direction.y *= -1;
+	// 	}
+	// 	if (fox_new_x - this.fox.hasSizeOf <= 0) 
+	// 	{
+	// 		fox_new_x = this.fox.hasSizeOf;
+	// 		this.fox.direction.x *= -1;
+	// 	}
+	// 	else if (fox_new_x + this.fox.hasSizeOf >= config.game_canvas.width) 
+	// 	{
+	// 		fox_new_x = config.game_canvas.width - this.fox.hasSizeOf;
+	// 		this.fox.direction.x *= -1;
+	// 	}
+	// 	if ((fox_new_x - this.fox.hasSizeOf) <= (config.paddle.buffer + config.paddle.width)) {
+	// 		if ((((fox_new_y - this.fox.hasSizeOf) > (this.paddle1.position.y + this.paddle1.height)) ||
+	// 			((fox_new_y + this.fox.hasSizeOf) < this.paddle1.position.y)))
+	// 		{
+	// 				//do nothing
+	// 		}
+	// 		else
+	// 		{
+	// 			fox_new_x = this.paddle1.position.x + config.paddle.width + this.fox.hasSizeOf;
+	// 			this.fox.direction.y = (fox_new_y - (this.paddle1.position.y + (this.paddle1.height / 2))) / (config.paddle.height / 4);
+	// 			this.fox.direction.x *= -1;
+	// 			this.foxPaddleBehavior(1);
+	// 		}
+	// 	}
+	// 	else if (fox_new_x + this.fox.hasSizeOf >= (config.game_canvas.width - config.paddle.buffer - config.paddle.width))
+	// 	{
+	// 		if (((((fox_new_y - this.fox.hasSizeOf) > (this.paddle2.position.y + this.paddle1.height)) ||
+	// 			(fox_new_y + this.fox.hasSizeOf) < this.paddle2.position.y)))
+	// 		{
+	// 			//do nothing
+	// 		}
+	// 		else
+	// 		{
+	// 			fox_new_x = this.paddle2.position.x - this.fox.hasSizeOf;
+	// 			this.fox.direction.y = (fox_new_y - (this.paddle2.position.y + (this.paddle2.height / 2))) / (config.paddle.height / 4);
+	// 			this.fox.direction.x *= -1;
+	// 			this.foxPaddleBehavior(2);
+	// 		}
+	// 	}
+	// 	// 1% chance if enraged to reverse x and/or y direction
+	// 	if (this.fox.isEnraged && Math.random() * 1000 <= 10)
+	// 		this.fox.direction.x *= -1;
+	// 	if (this.fox.isEnraged && Math.random() * 1000 <= 10)
+	// 		this.fox.direction.y *= -1;
+
+	// 	this.fox.position.x = fox_new_x;
+	// 	this.fox.position.y = fox_new_y;
+	// }
 
 	public calcBallPosition(ball: Ball) : Ball {
 		let ball_new_x: number = ball.position.x + Math.round(ball.velocity * ball.direction.x);
@@ -519,6 +781,17 @@ export class GameState
 				ball.direction.y = (ball_new_y - (this.paddle2.position.y + (this.paddle2.height / 2))) / (config.paddle.height / 4);
 				ball.direction.x *= -1;
 			}
+		}
+		if (Math.abs(ball.direction.y) > 1)
+		{
+			ball.direction.x = ball.direction.x / Math.abs(ball.direction.y);
+		}
+		else
+		{
+			if (ball.direction.x > 0)
+				ball.direction.x = 1;
+			else
+				ball.direction.x = -1;
 		}
 		ball.position.x = ball_new_x;
 		ball.position.y = ball_new_y;
@@ -563,19 +836,22 @@ export class GameState
 		if (this.isExtended === false)
 			return;
 
-		this.ball.velocity -= (this.speedIncCnt * 0.1);
 		this.roundStart = Date.now();
 		this.speedIncCnt = 0;
-		this.fox.hasSizeOf = config.fox.minSize;
-		this.fox.isEnraged = false;
-		this.fox.isEvil = false;
-		this.fox.velocity = config.fox.minVelocity;
-
-		this.ball2.position.x = config.game_canvas.width / 2;
-		this.ball2.position.y = config.game_canvas.height / 2;
-		this.ball2.direction = this.calcRandomDirection(this.instance.getRound());
-
+		// this.fox.hasSizeOf = config.fox.minSize;
+		// this.fox.isEnraged = false;
+		// this.fox.isEvil = false;
+		// this.fox.velocity = config.fox.minVelocity;
+		
+		// this.ball2.position.x = config.game_canvas.width / 2;
+		// this.ball2.position.y = config.game_canvas.height / 2;
+		// this.ball2.direction = this.calcRandomDirection(this.instance.getRound());
+		
 		//make the game faster each round 
+		this.ball.velocity -= (this.speedIncCnt * 0.1);
+		this.ball2.velocity -= (this.speedIncCnt * 0.1);
 		this.ball.velocity = config.ball.velocity + (this.instance.getRound() / 20);
+		this.ball2.velocity = config.ball.velocity + (this.instance.getRound() / 20);
+		this.fox.velocity = config.fox.minVelocity + (this.instance.getRound() / 20);
 	}
 }

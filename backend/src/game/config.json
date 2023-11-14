@@ -7,7 +7,7 @@
 		"buffer": 0,
 		"width": 10,
 		"velocity": 10,
-		"height": 70
+		"height": 100
 	},
 	"fps": 60,
 	"ball": {
@@ -22,12 +22,12 @@
 	"unlockSecondBallAt": 40,
 	"unlockPopupsAt": 50,
 	"fox": {
-		"minSize":	30,
-		"maxSize":	45,
-		"timeStick2Paddle":	3,
+		"minSize":	50,
+		"maxSize":	150,
+		"timeStick2Paddle":	1000,
 		"minVelocity":	5,
-		"maxVelocity":	10,
-		"maxTimeGoodEvil":	15,
+		"maxVelocity":	15,
+		"minTimeGoodEvil":	1000,
 		"getEnragedIn":	10,
 		"showUpWhen":	30
 	}
