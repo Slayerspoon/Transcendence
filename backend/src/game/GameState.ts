@@ -113,6 +113,7 @@ export class GameState
 		this.fox = new Fox(this.calcRandomDirection(Math.random() * 2));
 		this.harkinian = new Harkinian();
 		this.triggers = new Triggerables();
+		this.collisions = new Collisions();
 		this.winner = 0;
 		this.roundStart = Date.now();
 		this.speedIncCnt = 0;
