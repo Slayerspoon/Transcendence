@@ -14,7 +14,7 @@
 		"velocity": 5,
 		"radius": 15
 	},
-    "win": 50,
+    "win": 100,
 	"startTime": 5000,
 	"mmTimeout": 60000,
 	"unlockGnomeAt": 5,

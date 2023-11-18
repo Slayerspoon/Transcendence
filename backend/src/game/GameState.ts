@@ -159,6 +159,7 @@ export class GameState
 		this.controlHarkinian();
 		this.unlockBall();
 		this.unlockFox();
+		this.collisionCheck();
 		if (this.ball2.isUnlocked)
 			this.ball2 = this.calcBallPosition(this.ball2);
 		if (this.fox.isUnlocked)
