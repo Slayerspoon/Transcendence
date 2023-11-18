@@ -170,6 +170,7 @@ export class GameState
 			// this.unstickFoxFromPaddle();
 			// this.freePaddles();
 			this.moveFox(Date.now());
+			this.foxPaddleBehavior();
 			if (this.fox.triggeredEnrage > 0)
 				this.fox.triggeredEnrage--;
 			//this.foxBallCollission();
@@ -638,7 +639,7 @@ export class GameState
 	// 	this.fox.timeStamp = Date.now();
 	// }
 
-	public foxPaddleBehavior(paddle: number): void
+	public foxPaddleBehavior(): void
 	{
 		if (this.fox.isUnlocked === true)
 		{
