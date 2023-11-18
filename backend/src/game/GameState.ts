@@ -577,6 +577,7 @@ export class GameState
 		if (this.instance.getScore1() + this.instance.getScore2() == config.fox.showUpWhen)
 		{
 			this.fox.isUnlocked = true;
+			this.fox.timestampLastAppeased = Date.now();
 			this.fox.timeStamp = Date.now();
 			this.fox.paddleTime = Date.now();
 		}
