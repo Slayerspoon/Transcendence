@@ -561,7 +561,7 @@ export class GameState
 		}
 		if (this.instance.getScore1() + this.instance.getScore2() >= config.unlockPopupsAt)
 		{
-			if (Math.floor(Math.random() * 666) === 333)
+			if (Math.floor(Math.random() * 6666) === 666)
 				this.triggers.triggeredPopup = true;
 			else
 				this.triggers.triggeredPopup = false;

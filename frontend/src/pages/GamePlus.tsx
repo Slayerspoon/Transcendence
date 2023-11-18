@@ -773,11 +773,11 @@ const Game: React.FC = () =>
 			}
 			if (collisionFoxPaddle1 === true || collisionFoxPaddle2 === true)
 			{
-				if (foxEvil === true && foxSoundsEvilIsPlaying() === false)
+				if (foxEvil === true && foxSoundsEvilNotPlaying() === true)
 				{
 					fox_sounds_evil();
 				}
-				if (foxEvil === false && foxSoundsGoodIsPlaying() === false)
+				if (foxEvil === false && foxSoundsGoodNotPlaying() === true)
 				{
 					fox_sounds_good();
 				}
@@ -1211,38 +1211,50 @@ const Game: React.FC = () =>
 	// 	}
 	// }
 
-	function foxSoundsGoodIsPlaying(): boolean
+	function foxSoundsGoodNotPlaying(): boolean
 	{
-		if (audioFoxChicken.current.paused === false || audioFoxChicken.current.ended === false)
+		let countNotPlaying: number = 0;
+
+		if (audioFoxChicken.current.paused === true || audioFoxChicken.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxGoat.current.paused === true || audioFoxGoat.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxMeow.current.paused === true || audioFoxMeow.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxPig.current.paused === true || audioFoxPig.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxQuack.current.paused === true || audioFoxQuack.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxTweet.current.paused === true || audioFoxTweet.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxWoof.current.paused === true || audioFoxWoof.current.ended === true)
+			countNotPlaying++;
+
+		if (countNotPlaying == 7)
 			return true;
-		if (audioFoxGoat.current.paused === false || audioFoxGoat.current.ended === false)
-			return true;
-		if (audioFoxMeow.current.paused === false || audioFoxMeow.current.ended === false)
-			return true;
-		if (audioFoxPig.current.paused === false || audioFoxPig.current.ended === false)
-			return true;
-		if (audioFoxQuack.current.paused === false || audioFoxQuack.current.ended === false)
-			return true;
-		if (audioFoxTweet.current.paused === false || audioFoxTweet.current.ended === false)
-			return true;
-		if (audioFoxWoof.current.paused === false || audioFoxWoof.current.ended === false)
-			return true;
-		return false;
+		else
+			return false;
 	}
 
-	function foxSoundsEvilIsPlaying(): boolean
+	function foxSoundsEvilNotPlaying(): boolean
 	{
-		if (audioFoxAhee.current.paused === false || audioFoxAhee.current.ended === false)
+		let countNotPlaying: number = 0;
+
+		if (audioFoxAhee.current.paused === true || audioFoxAhee.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxCha.current.paused === true || audioFoxCha.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxKaka.current.paused === true || audioFoxKaka.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxPapa.current.paused === true || audioFoxPapa.current.ended === true)
+			countNotPlaying++;
+		if (audioFoxYok.current.paused === true || audioFoxYok.current.ended === true)
+			countNotPlaying++;
+
+		if (countNotPlaying == 5)
 			return true;
-		if (audioFoxCha.current.paused === false || audioFoxCha.current.ended === false)
-			return true;
-		if (audioFoxKaka.current.paused === false || audioFoxKaka.current.ended === false)
-			return true;
-		if (audioFoxPapa.current.paused === false || audioFoxPapa.current.ended === false)
-			return true;
-		if (audioFoxYok.current.paused === false || audioFoxYok.current.ended === false)
-			return true;
-		return false;
+		else
+			return false;
 	}
 	
 	function fox_sounds_good(): void
