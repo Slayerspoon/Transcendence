@@ -1775,12 +1775,14 @@ const Game: React.FC = () =>
 		else if (score1 + score2 === 10 && difficultyScore < 10)
 		{
 			setDifficultyScore(10);
-			setIsUnlockedRandomRGB1(true);
+			setIsUnlockedRandomRGB2(true);
+			// setIsUnlockedRandomRGB1(true);
 		}
 		else if (score1 + score2 === 15 && difficultyScore < 15)
 		{
 			setDifficultyScore(15);
 			setIsUnlockedRandomRGB1(false);
+			setIsUnlockedRandomRGB2(false);
 			setColorCodeRGBBackground("000000");
 			setColorCodeRGBScore("CCCCCC");
 			setColorCodeRGBBall1("CCCCCC");

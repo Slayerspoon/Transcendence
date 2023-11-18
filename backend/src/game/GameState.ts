@@ -756,31 +756,49 @@ export class GameState
 		let ball_new_x: number = ball.position.x + Math.round(ball.velocity * ball.direction.x);
 		let ball_new_y: number = ball.position.y + Math.round(ball.velocity * ball.direction.y);
 
-		if (ball_new_y - ball.radius <= 0) {
+		if (ball_new_y - ball.radius <= 0)
+		{
 			ball_new_y = ball.radius;
 			ball.direction.y *= -1;
-		} else if (ball_new_y + ball.radius >= config.game_canvas.height) {
+		}
+		else if (ball_new_y + ball.radius >= config.game_canvas.height)
+		{
 			ball_new_y = config.game_canvas.height - ball.radius;
 			ball.direction.y *= -1;
 		}
-		if ((ball_new_x - ball.radius) <= (config.paddle.buffer + config.paddle.width)) {
+		if ((ball_new_x - ball.radius) <= (config.paddle.buffer + config.paddle.width))
+		{
 			if ((((ball_new_y - ball.radius) > (this.paddle1.position.y + this.paddle1.height)) ||
 				((ball_new_y + ball.radius) < this.paddle1.position.y)) &&
-				(!this.instance.hasScored())) {
+				(!this.instance.hasScored()))
+			{
 					this.instance.scoreP2();
 					this.instance.setScored();
-			} else {
+					ball_new_x = config.game_canvas.width / 2;
+					ball_new_y = config.game_canvas.height / 2;
+					ball.direction = this.calcRandomDirection(this.instance.getRound());
+			}
+			else
+			{
 				ball_new_x = this.paddle1.position.x + config.paddle.width + ball.radius;
 				ball.direction.y = (ball_new_y - (this.paddle1.position.y + (this.paddle1.height / 2))) / (config.paddle.height / 4);
 				ball.direction.x *= -1;
 			}
-		} else if (ball_new_x + ball.radius >= (config.game_canvas.width - config.paddle.buffer - config.paddle.width)) {
+		}
+		else if (ball_new_x + ball.radius >= (config.game_canvas.width - config.paddle.buffer - config.paddle.width))
+		{
 			if (((((ball_new_y - ball.radius) > (this.paddle2.position.y + this.paddle1.height)) ||
 				(ball_new_y + ball.radius) < this.paddle2.position.y)) &&
-				(!this.instance.hasScored())) {
+				(!this.instance.hasScored()))
+			{
 					this.instance.scoreP1();
 					this.instance.setScored();
-			} else {
+					ball_new_x = config.game_canvas.width / 2;
+					ball_new_y = config.game_canvas.height / 2;
+					ball.direction = this.calcRandomDirection(this.instance.getRound());
+			}
+			else
+			{
 				ball_new_x = this.paddle2.position.x - ball.radius;
 				ball.direction.y = (ball_new_y - (this.paddle2.position.y + (this.paddle2.height / 2))) / (config.paddle.height / 4);
 				ball.direction.x *= -1;
@@ -802,23 +820,33 @@ export class GameState
 		return ball;
 	}
 
-	public calcPaddlePosition(paddle: Paddle) : void {
+	public calcPaddlePosition(paddle: Paddle): void
+	{
 		if (paddle.isImmobile)
 			return;
-		if (paddle.position.y + (paddle.direction * config.paddle.velocity) <= 0) {
+		if (paddle.position.y + (paddle.direction * config.paddle.velocity) <= 0)
+		{
 			paddle.position.y = 0;
-		} else if ((paddle.position.y + paddle.height + (paddle.direction * config.paddle.velocity)) >= config.game_canvas.height) {
+		}
+		else if ((paddle.position.y + paddle.height + (paddle.direction * config.paddle.velocity)) >= config.game_canvas.height)
+		{
 			paddle.position.y = config.game_canvas.height - paddle.height;
-		} else {
+		}
+		else
+		{
 			paddle.position.y += paddle.direction * config.paddle.velocity;
 		}
 	}
 
-	public setPaddleDirection(id: number, direction: number) : void {
+	public setPaddleDirection(id: number, direction: number): void
+	{
 		let paddle: Paddle;
-		if (id === 1) {
+		if (id === 1)
+		{
 			paddle = this.paddle1;
-		} else {
+		}
+		else
+		{
 			paddle = this.paddle2;
 		}
 		paddle.direction = direction;
@@ -827,9 +855,9 @@ export class GameState
 	public resetGameState() : void 
 	{
 		this.instance.notScored();
-		this.ball.position.x = config.game_canvas.width / 2;
-		this.ball.position.y = config.game_canvas.height / 2;
-		this.ball.direction = this.calcRandomDirection(this.instance.getRound());
+		// this.ball.position.x = config.game_canvas.width / 2;
+		// this.ball.position.y = config.game_canvas.height / 2;
+		// this.ball.direction = this.calcRandomDirection(this.instance.getRound());
 
 		if (this.isExtended === false)
 		{
