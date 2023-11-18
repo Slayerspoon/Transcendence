@@ -783,17 +783,17 @@ export class GameState
 				ball.direction.x *= -1;
 			}
 		}
-		if (Math.abs(ball.direction.y) > 1)
-		{
-			ball.direction.x = ball.direction.x / Math.abs(ball.direction.y);
-		}
-		else
-		{
-			if (ball.direction.x > 0)
-				ball.direction.x = 1;
-			else
-				ball.direction.x = -1;
-		}
+		// if (Math.abs(ball.direction.y) > 1)
+		// {
+		// 	ball.direction.x = ball.direction.x / Math.abs(ball.direction.y);
+		// }
+		// else
+		// {
+		// 	if (ball.direction.x > 0)
+		// 		ball.direction.x = 1;
+		// 	else
+		// 		ball.direction.x = -1;
+		// }
 		ball.position.x = ball_new_x;
 		ball.position.y = ball_new_y;
 		return ball;
