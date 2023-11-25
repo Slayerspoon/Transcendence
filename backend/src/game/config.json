@@ -20,7 +20,7 @@
 	"unlockGnomeAt": 5,
 	"unlockHarkinianAt": 15,
 	"unlockSecondBallAt": 40,
-	"unlockPopupsAt": 50,
+	"unlockPopupsAt": 100,
 	"fox": {
 		"minSize":	50,
 		"maxSize":	150,

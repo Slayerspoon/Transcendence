@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import { WebsocketContext } from "../components/Context/WebsocketContexts";
+import { Box } from "@chakra-ui/react";
 
 import JoinRandom from '../components/Game/JoinRandom';
 import JoinRandomPlus from '../components/Game/JoinRandomPlus';
@@ -2390,14 +2391,20 @@ const Game: React.FC = () =>
 	
 	return (
 		<div>
-			{/* <JoinRandom /> */}
 			<JoinRandomPlus />
+			<Box bg="#800020" p={4} borderRadius="15px">
+				<p style={{ fontSize: "30px", fontWeight: "bold", color: "#200000" }}>Transcendence: The Cursed Duel of Eternal Madness</p>
+				<br></br>
+				<p>CONTROLS:</p>
+				<p>"UP Arrow key: Move paddle up"</p>
+				<p>"DOWN Arrow key: Move paddle down"</p>
+				<p>"SPACE key: Keep pressed to double paddle speed"</p>
+				<br></br>
+				<p style={{ fontSize: "20px", color: "#FFAA00" }}>WARNING: This game may potentially trigger seizures for people with photosensitive epilepsy!</p>
+      		</Box>
 			<canvas
 				ref={canvasRef}
-				// width="1200"
-				// height="720"
-				// style={{ border: "1px solid black" }}
-				style={{ border: "1px solid black", width: '100%', height: '100%', display: 'block' }}
+				style={{ border: "0px solid black", width: '100%', height: '100%', display: 'block' }}
 			></canvas>
 			<audio ref={audioGnome}>
         		<source src={audioGnomeSrc} type="audio/mp3"/>
@@ -2471,7 +2478,6 @@ const Game: React.FC = () =>
 			<video ref={videoHarkinianHit} style={{ display: 'none' }}>
         		<source src={videoHarkinianHitSrc} type="video/mp4"/>
       		</video>
-			{/* <ReceivedGameData /> */}
 		</div>
 	);
 };

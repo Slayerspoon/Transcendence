@@ -201,7 +201,7 @@ const Game: React.FC = () => {
         // width="1200"
         // height="720"
         // style={{ border: "1px solid black" }}
-		style={{ border: "1px solid black", width: '100%', height: '100%', display: 'block' }}
+		style={{ border: "0px solid black", width: '100%', height: '100%', display: 'block' }}
       ></canvas>
       <Box bg="#e0dbb7" p={4}>
         <p>Transcendence: The Duel of Eternity</p>
