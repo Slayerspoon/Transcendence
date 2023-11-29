@@ -9,7 +9,7 @@ After some research, I discovered the "Canvas" element. Excerpt from Wikipedia:
 It is a low level, procedural model that updates a bitmap. HTML5 Canvas also helps in making 2D games."
 This sounded perfect for the scope of Transcendence.
 
-2. Creating a locally playable classic Pong
+2. Creating a locally-playable classic Pong
 After discovering Canvas, I looked for a good tutorial and - conveniently enough -
 I found an official Canvas tutorial for a classic brick-breaker-style game.
 The tutorial only took a few hours to finish.
@@ -22,7 +22,16 @@ The whole game was just one HTML file with around 200 lines of JavaScript code.
 3. Getting creative
 I had been having such a good time completing the game after starting from scratch in just 2 days,
 that I wanted to experiment with the possibilities some more.
-I wanted to add some special touches to the design of the game. So I added the gnome.
+I wanted to add some special touches to the design of the game. So I tried adding some music.
+That was easy. And fun! But I wanted something more challenging. And more abstract. And more confusing.
+So I added the gnome.
 Making a static image appear on top of a moving ball for short periods of time
 at random intervals along with a sound effect was a very encouraging start.
-But I needed more.
+But I needed even more.
+I continued by messing with the game colors on collisions. This, again, was fun; however, not crazy enough.
+I remembered about the many great YouTube poops featuring King Harkinian. So I gave him a role in the game as well.
+The only major difference between King Harkinian and the gnome is that King Harkinian was going to be a video.
+Speaking of videos, since I felt my game still needed more character, I remembered about the Mcroll'd YouTube video.
+Not only did I add the Mcroll'd video, but I also queued the reverse version right after it and created an endless cycle.
+The game still didn't have enough distractions in it, so I got the idea to add pop-ups, which would disrupt the game.
+That one was also easy to implement. How about one more ball? Yes, that could be quite stressful...
