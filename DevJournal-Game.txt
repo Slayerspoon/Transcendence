@@ -1,0 +1,28 @@
+ft_transcendence DevJournal: Developing the game
+
+1. Identifying the adequate tools
+The goal was to find a way to implement a Pong game that was supposed to run in a browser.
+Pong is based on graphics that are simplistic, but graphics nonetheless.
+Thus, the first big task was to find a good way to render smooth graphics and embed them in HTML.
+After some research, I discovered the "Canvas" element. Excerpt from Wikipedia:
+"The canvas element is part of HTML5 and allows for dynamic, scriptable rendering of 2D shapes and bitmap images.
+It is a low level, procedural model that updates a bitmap. HTML5 Canvas also helps in making 2D games."
+This sounded perfect for the scope of Transcendence.
+
+2. Creating a locally playable classic Pong
+After discovering Canvas, I looked for a good tutorial and - conveniently enough -
+I found an official Canvas tutorial for a classic brick-breaker-style game.
+The tutorial only took a few hours to finish.
+By the end of it, I had a fully functional game with a paddle, a ball and collisions.
+This was as close as it could get to a Pong game, without actually being Pong.
+The only changes I needed were adding one more controllable paddle, removing the bricks and adjusting the logic.
+After another hour or two, I had a fully functional game of Pong that could be played by two players on the same keyboard.
+The whole game was just one HTML file with around 200 lines of JavaScript code.
+
+3. Getting creative
+I had been having such a good time completing the game after starting from scratch in just 2 days,
+that I wanted to experiment with the possibilities some more.
+I wanted to add some special touches to the design of the game. So I added the gnome.
+Making a static image appear on top of a moving ball for short periods of time
+at random intervals along with a sound effect was a very encouraging start.
+But I needed more.
