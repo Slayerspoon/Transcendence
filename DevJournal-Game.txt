@@ -35,3 +35,24 @@ Speaking of videos, since I felt my game still needed more character, I remember
 Not only did I add the Mcroll'd video, but I also queued the reverse version right after it and created an endless cycle.
 The game still didn't have enough distractions in it, so I got the idea to add pop-ups, which would disrupt the game.
 That one was also easy to implement. How about one more ball? Yes, that could be quite stressful...
+It still felt like the game wouldn't end up being frustrating enough. How about some kind of enemy character?
+That's when I remembered that, a few days before, my teammate showed me some examples of bad taxidermy on the Internet.
+One of the more disturbing creations was a fox, sitting on a chair, similar to how a human would. I liked it.
+For this one, I had to use all the knowledge I had already gathered developing all the previous custom features.
+Of all the features, this one required the most logic and scripting and it still turned out very well.
+After successfully implementing the fox, I went back to the gnome and gave it the ability
+to swap the fox's position with the balls - at random, of course.
+As one final addition - because I thought the game was still not deranging enough -
+I added 150 different flashing messages that I came up with in an unsettlingly short time.
+At this point, I was still unaware we were supposed to also implement an enhanced version of Pong anyway.
+
+4. Migrating to TypeScript and React
+Now that the game was fully functional - at least in a local multiplayer version - it was time to make it play online.
+The process of adapting it to work as a component in a web page with TypeScript and React was unexpectedly tedious.
+React has proven to be more restrictive, rather than facilitating, and forced me to rethink a lot of fundamentals.
+I initially attempted to split the one game file into separate ones for balls, paddles, collisions etc.
+Unfortunately, after a few weeks of failing at this, I had to stop and just leave everything in one file.
+So, the game was now in the same state, except it was implemented in React with TypeScript.
+The final step was to split it between the front-end and the back-end.
+
+5. Splitting between front-end and back-end
